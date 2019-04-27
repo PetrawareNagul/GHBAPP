@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{487390A2-5B66-44AF-BC62-B50F80FEE5F8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Silverlake.Service</RootNamespace>
+    <AssemblyName>Silverlake.Service</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BatchHeaderService.cs" />
+    <Compile Include="BatchLogService.cs" />
+    <Compile Include="BatchService.cs" />
+    <Compile Include="BranchDepartmentService.cs" />
+    <Compile Include="BranchService.cs" />
+    <Compile Include="BranchUserService.cs" />
+    <Compile Include="CompanyService.cs" />
+    <Compile Include="CompanyUserService.cs" />
+    <Compile Include="DepartmentService.cs" />
+    <Compile Include="DepartmentUserService.cs" />
+    <Compile Include="IService\IBatchHeaderService.cs" />
+    <Compile Include="IService\IBatchLogService.cs" />
+    <Compile Include="IService\IBatchService.cs" />
+    <Compile Include="IService\IBranchDepartmentService.cs" />
+    <Compile Include="IService\IBranchService.cs" />
+    <Compile Include="IService\IBranchUserService.cs" />
+    <Compile Include="IService\ICompanyService.cs" />
+    <Compile Include="IService\ICompanyUserService.cs" />
+    <Compile Include="IService\IDepartmentService.cs" />
+    <Compile Include="IService\IDepartmentUserService.cs" />
+    <Compile Include="IService\ILanguageDirService.cs" />
+    <Compile Include="IService\ISetDocumentService.cs" />
+    <Compile Include="IService\ISetService.cs" />
+    <Compile Include="IService\IStageService.cs" />
+    <Compile Include="IService\IUserDetailService.cs" />
+    <Compile Include="IService\IUserLoginHistoryService.cs" />
+    <Compile Include="IService\IUserRoleService.cs" />
+    <Compile Include="IService\IUserSecurityService.cs" />
+    <Compile Include="IService\IUserSecurityTypeService.cs" />
+    <Compile Include="IService\IUserService.cs" />
+    <Compile Include="IService\IUserTypeService.cs" />
+    <Compile Include="LanguageDirService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SetDocumentService.cs" />
+    <Compile Include="SetService.cs" />
+    <Compile Include="StageService.cs" />
+    <Compile Include="UserDetailService.cs" />
+    <Compile Include="UserLoginHistoryService.cs" />
+    <Compile Include="UserRoleService.cs" />
+    <Compile Include="UserSecurityService.cs" />
+    <Compile Include="UserSecurityTypeService.cs" />
+    <Compile Include="UserService.cs" />
+    <Compile Include="UserTypeService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Silverlake.Repo\Silverlake.Repo.csproj">
+      <Project>{40337e3b-b74a-4f4a-8446-474d9cb8e48b}</Project>
+      <Name>Silverlake.Repo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Silverlake.Utility\Silverlake.Utility.csproj">
+      <Project>{a57d2af5-0527-427f-8d7c-5c76cf7d280c}</Project>
+      <Name>Silverlake.Utility</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
