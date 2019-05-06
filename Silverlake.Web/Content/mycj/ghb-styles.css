@@ -155,3 +155,14 @@ ul.sidebar-menu li a.active, ul.sidebar-menu li a:hover, ul.sidebar-menu li a:fo
     float: left;
     width: 100px;
 }
+
+#StatisticForm .panel-heading {
+    background: #d3d3d3;
+}
+
+#StatisticForm .panel-body {
+    background: #f1f2f7;
+}
+#StatisticForm .top-stats-panel {
+    background: #f1f2f7;
+}

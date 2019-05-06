@@ -11,5 +11,6 @@ namespace Silverlake.Service.IService
     public interface IBranchService : IDefaultInterface<Branch>
     {
         List<Branch> GetDataTableData(DataTableAjaxPostModel model, out int filteredResultsCount, out int totalResultsCount);
+        List<Branch> GetUtilizedBranches();
     }
 }

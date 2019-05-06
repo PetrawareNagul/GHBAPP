@@ -5,77 +5,129 @@
 <head runat="server">
     <title></title>
     <!--Morris Chart CSS -->
-    <link rel="stylesheet" href="http://bucketadmin.themebucket.net/js/morris-chart/morris.css" />
+    <link href="Content/js/morris-chart/morris.css" rel="stylesheet" />
+    <%--<link rel="stylesheet" href="http://bucketadmin.themebucket.net/js/morris-chart/morris.css" />--%>
 </head>
 <body>
 
-    <form id="form1" runat="server">
-
+    <form id="StatisticForm" runat="server">
 
         <div class="container-fluid">
 
-            <hr />
-
-            <!--mini statistics start-->
             <div class="row">
-                <div class="col-md-3" style="height: 200px">
-                    <section class="panel">
-                        <div class="panel-body">
-                            <div class="top-stats-panel">
-                                <div class="gauge-canvas">
-                                    <h4 class="widget-h">SAN Drive Memory</h4>
-                                    <canvas width="160" height="100" id="gauge"></canvas>
-                                </div>
-                                <ul class="gauge-meta clearfix">
-                                    <li id="gauge-textfield" class="pull-left gauge-value"></li>
-                                    <li class="pull-right gauge-title">
-                                        <asp:Label ID="lbltotalSize1" runat="server" ClientIDMode="Static"></asp:Label>
-                                        - GB </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
+                <div class="col-md-1">
                 </div>
-                <div class="col-md-3" style="height: 200px">
-                    <section class="panel">
-                        <div class="panel-body">
-                            <div class="top-stats-panel">
-                                <div class="daily-visit">
-                                    <h4 class="widget-h">Today Scan</h4>
-                                    <canvas id="bar-chart-js1" height="120" width="200" style="width: 200px; height: 120px;"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-                <div class="col-md-3" style="height: 200px">
-                    <section class="panel">
-                        <div class="panel-body">
-                            <div class="top-stats-panel">
-                                <h4 class="widget-h">Today Transfer</h4>
-                                <div class="chartJS" style="height: 150px;">
-                                    <canvas id="donut-chart-js1" height="150" width="150" style="width: 150px; height: 150px;"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-                <div class="col-md-3" style="height: 200px">
-                    <section class="panel">
-                        <div class="panel-body">
-                            <div class="top-stats-panel">
-                                <h4 class="widget-h">Total Applications</h4>
-                                <h1 id="fun-level" style="color: red; text-align: center" class="bg-warning"></h1>
-                                <%--<img width="230px" height="80px" src="https://www.votiro.com/wp-content/uploads/2018/03/votiro.gif" />--%>
+                <div class="col-md-12">
+                    <div class="content">
+                        <div class="page-common-section">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="search-section">
 
-                                <hr />
+                                        <div class="search-features">
+                                            <div class="row">
 
-                                <div id="divDepartments" runat="server">
-                                
+
+                                                <div class="col-md-2">
+                                                    <asp:DropDownList ID="BranchId" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
+                                                </div>
+
+
+                                                <div class="col-md-4">
+                                                    <div class="input-group input-large" data-date="" data-date-format="mm/dd/yyyy">
+                                                        <input type="text" class="form-control dpd1" id="FromDate" runat="server" name="FromDate" placeholder="From Date" />
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <span class="input-group-addon">To</span>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="input-group input-large" data-date="" data-date-format="mm/dd/yyyy">
+                                                        <input type="text" class="form-control dpd2" name="ToDate" id="ToDate" runat="server" placeholder="To Date" />
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1">
+                                                </div>
+                                                <input type="hidden" id="IsNewSearch" name="IsNewSearch" value="0" runat="server" clientidmode="static" />
+                                                <input type="hidden" id="IsClear" name="IsClear" value="0" runat="server" clientidmode="static" />
+                                            </div>
+                                        </div>
                                     </div>
-
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="action-button" data-action="Search"><i class="fa fa-search"></i></button>
+                                    <button type="button" class="action-button" data-action="Refresh"><i class="fa fa-refresh"></i></button>
+                                </div>
                             </div>
-                            <%--<div class="top-stats-panel">
+                        </div>
+                    </div>
+
+                    <div class="page-container-section">
+                        <div id="divResult" runat="server">
+                            <div class="alert alert-success fade in">
+                            </div>
+                        </div>
+                        <!--mini statistics start-->
+                        <div class="row">
+                            <div class="col-md-3" style="height: 200px; margin-bottom: 15px; overflow-y: hidden;">
+                                <section class="panel">
+                                    <div class="panel-body">
+                                        <div class="top-stats-panel">
+                                            <div class="gauge-canvas">
+                                                <h4 id="lblSANDrive" runat="server" class="widget-h">SAN Drive Memory</h4>
+                                                <canvas width="160" height="100" id="gauge"></canvas>
+                                            </div>
+                                            <ul class="gauge-meta clearfix">
+                                                <li id="gauge-textfield" class="pull-left gauge-value"></li>
+                                                <li class="pull-right gauge-title">
+                                                    <asp:Label ID="lbltotalSize1" runat="server" ClientIDMode="Static"></asp:Label>
+                                                    - GB </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="col-md-3" style="height: 200px; margin-bottom: 15px; overflow-y: hidden;">
+                                <section class="panel">
+                                    <div class="panel-body">
+                                        <div class="top-stats-panel">
+                                            <div class="daily-visit">
+                                                <h4 id="lblScan" runat="server" class="widget-h">Today Scan</h4>
+                                                <canvas id="bar-chart-js1" height="120" width="200" style="width: 200px; height: 120px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="col-md-3" style="height: 200px; margin-bottom: 15px; overflow-y: hidden;">
+                                <section class="panel">
+                                    <div class="panel-body">
+                                        <div class="top-stats-panel">
+                                            <h4 id="lblTransfer" runat="server" class="widget-h">Today Transfer</h4>
+                                            <div class="chartJS" style="height: 150px;">
+                                                <canvas id="donut-chart-js1" height="150" width="150" style="width: 150px; height: 150px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="col-md-3" style="height: 200px; margin-bottom: 15px; overflow-y: hidden;">
+                                <section class="panel">
+                                    <div class="panel-body">
+                                        <div class="top-stats-panel">
+                                            <h4 id="lblTotalApp" runat="server" class="widget-h">Total Applications</h4>
+                                            <h1 id="fun-level" style="color: red; text-align: center" class=""></h1>
+                                            <%--<img width="230px" height="80px" src="https://www.votiro.com/wp-content/uploads/2018/03/votiro.gif" />--%>
+
+                                            <hr />
+
+                                            <div id="divDepartments" runat="server">
+                                            </div>
+
+                                        </div>
+                                        <%--<div class="top-stats-panel">
                     <h4 class="widget-h">Daily Sales</h4>
                     <div class="bar-stats">
                         <ul class="progress-stat-bar clearfix">
@@ -93,64 +145,67 @@
                         </div>
                     </div>
                 </div>--%>
+                                    </div>
+                                </section>
+                            </div>
                         </div>
-                    </section>
-                </div>
-            </div>
-            <!--mini statistics end-->
+                        <!--mini statistics end-->
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <section class="panel">
-                        <header class="panel-heading">
-                            Bar Chart
-                        <span class="tools pull-right">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <section class="panel">
+                                    <header class="panel-heading">
+                                        Bar Chart
+         <%--               <span class="tools pull-right">
                             <a href="javascript:;" class="fa fa-chevron-down"></a>
                             <a href="javascript:;" class="fa fa-cog"></a>
                             <a href="javascript:;" class="fa fa-times"></a>
-                        </span>
-                        </header>
-                        <div class="panel-body">
-                            <div class="chartJS" style="height: 266px;">
-                                <canvas id="bar-chart-js" height="262" width="1049" style="width: 1049px; height: 262px;"></canvas>
-                            </div>
-                            <div style="display: none" id="divDayCount" runat="server"></div>
+                        </span>--%>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div class="chartJS" style="height: 266px;">
+                                            <canvas id="bar-chart-js" height="262" width="1049" style="width: 1049px; height: 262px;"></canvas>
+                                        </div>
+                                        <div style="display: none" id="divDayCount" runat="server"></div>
 
-                            <div style="display: none" id="divtoDayCount" runat="server"></div>
+                                        <div style="display: none" id="divtoDayCount" runat="server"></div>
 
-                        </div>
-                    </section>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-6">
-                    <section class="panel">
-                        <header class="panel-heading">
-                            Total Application Chart
-                        </header>
-                        <div class="panel-body">
-                            <div class="chartJS" style="height: 274px;">
-                                <canvas id="pie-chart-js" height="270" width="495" style="width: 495px; height: 270px;"></canvas>
+                                    </div>
+                                </section>
                             </div>
                         </div>
-                    </section>
-                    <div id="divTotal" runat="server">
-                    </div>
-                </div>
 
-                <div class="col-sm-6">
-                    <section class="panel">
-                        <header class="panel-heading">
-                            Last Month Application Chart
-                        </header>
-                        <div class="panel-body">
-                            <div class="chartJS" style="height: 274px;">
-                                <canvas id="donut-chart-js" height="270" width="495" style="width: 495px; height: 270px;"></canvas>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <section class="panel">
+                                    <header class="panel-heading">
+                                        Total Application Chart
+                                    </header>
+                                    <div class="panel-body">
+                                        <div id="divTotal" runat="server">
+                                        </div>
+                                        <div class="chartJS" style="height: 274px;">
+                                            <canvas id="pie-chart-js" height="270" width="495" style="width: 495px; height: 270px;"></canvas>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <section class="panel">
+                                    <header class="panel-heading">
+                                        <span id="lblMonthApp" runat="server">Last Month Application Chart</span>
+                                    </header>
+                                    <div class="panel-body">
+                                        <div id="divMonth" runat="server">
+                                        </div>
+                                        <div class="chartJS" style="height: 274px;">
+                                            <canvas id="donut-chart-js" height="270" width="495" style="width: 495px; height: 270px;"></canvas>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
                         </div>
-                    </section>
-                    <div id="divMonth" runat="server">
                     </div>
                 </div>
             </div>
@@ -174,9 +229,48 @@
     </form>
 </body>
 </html>
+<script src="Content/mycj/common-scripts.js"></script>
 <script src="/Content/js/gauge/gauge.js"></script>
 <!--jQuery Flot Chart-->
 <script src="/Content/js/flot-chart/jquery.flot.js"></script>
+<script src="Content/js/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+<script>
+    $ui(document).ready(function () {
+
+        $ui('.dpd1, .dpd2').datepicker({
+            format: 'mm/dd/yyyy',
+            pickTime: false,
+            autoclose: true
+        });
+
+        //$ui('.dpd1').datepicker({
+        //    format: 'mm/dd/yyyy',
+        //    pickTime: false,
+        //    autoclose: true
+        //});
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#StatisticForm .popovers').popover();
+
+        $('.view_batch_log').click(function () {
+            var divLog = $(this).next();
+            $('.div_batch_log').each(function (idx, obj) {
+                if (!$(obj).hasClass('hide'))
+                    $(obj).addClass('hide');
+            });
+            $(divLog).removeClass('hide');
+        });
+
+        $('.draggableDiv').draggable();
+
+        $('.log_close').click(function () {
+            $(this).parent('.div_batch_log').addClass('hide');
+        });
+    });
+</script>
 
 <script>
 
@@ -247,11 +341,9 @@
             // end bar Chart
 
             // var todayChartData = [];
-            debugger
             var todayChartObj = [];
             var todayChartData = [];
             $('#tbltoDays tr').each(function (index, values) {
-                debugger;
                 var todaysObj = [];
                 var day = $(this).find('#lbldepartmentsetcount').text().split(',');
                 todaysObj.push(parseInt(day));
@@ -265,7 +357,8 @@
 
             if (todayChartObj.length == 0) {
                 todayChartData = {
-                    labels: ["Today Scan"],
+                    //labels: ["Today Scan"],
+                    labels: [""],
                     datasets: [
                         {
                             fillColor: "#E1EB5A",
@@ -297,7 +390,8 @@
             }
             else {
                 todayChartData = {
-                    labels: ["Today Scan"],
+                    //labels: ["Today Scan"],
+                    labels: [""],
                     datasets: todayChartObj
                 }
             }
@@ -335,7 +429,6 @@
             //    ]
 
             //}
-            debugger;
             var myLine1 = new Chart(document.getElementById("bar-chart-js1").getContext("2d")).Bar(todayChartData);
 
             // Total sets pie chat
@@ -381,14 +474,23 @@
             var todayColors = $('#lblTodayColor').val().split(',');
 
             var todayObj = [];
-
+            var count = 0;
             for (var i = 0; i < todayCounts.length; i++) {
-                todayObj.push({ 
-                    value: parseInt(todayCounts[i]),
-                    color: '#' + todayColors[i]
+                if (parseInt(todayCounts[i]) != 0) {
+                    count = 1;
+                    todayObj.push({
+                        value: parseInt(todayCounts[i]),
+                        color: '#' + todayColors[i]
+                    });
+                }
+            }
+            if (count == 0) {
+                todayObj.push({
+                    value: 1,
+                    color: '#fff'
                 });
             }
-
+            debugger
             var myDonut = new Chart(document.getElementById("donut-chart-js1").getContext("2d")).Doughnut(todayObj);
             //end pie chat
 
@@ -571,12 +673,16 @@
             },
             complete: function () {
                 ele.text(no);
-                $('#fun-level').css("color", "#44E92B");
+                $('#fun-level').css("color", "#f89828");
             }
         });
     }
 
-    animateNumber($('#fun-level'), $('#lblTotalApplication').val(), 10000);
+    if ($('#lblTotalApplication').val() != '' && $('#lblTotalApplication').val() != '0') {
+        animateNumber($('#fun-level'), $('#lblTotalApplication').val(), 10000);
+    } else {
+        $('#fun-level').html('0');
+    }
 
 
     //var percent_number_step = $.animateNumber.numberStepFactories.append(' %')

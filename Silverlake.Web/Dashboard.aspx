@@ -25,15 +25,15 @@
                                             </select>
                                             <input type="hidden" id="IsNewSearch" name="IsNewSearch" value="0" runat="server" clientidmode="static" />
                                             <div class="search-message" id="searchMessage" runat="server"></div>
-                                            <div class="input-group input-large" >
-                                                  <input type="text" class="form-control form-control-inline input-medium default-date-picker" id="FromDate" runat="server" name="FromDate" placeholder="From Date" />
-                                                 <%--   <span class="input-group-addon">
+                                            <div class="input-group input-large">
+                                                <input type="text" class="form-control form-control-inline input-medium default-date-picker" id="FromDate" runat="server" name="FromDate" placeholder="From Date" />
+                                                <%--   <span class="input-group-addon">
                                                         <i class="fa fa-calendar"></i>
                                                     </span>--%>
 
                                                 <span class="input-group-addon">To</span>
                                                 <input type="text" class="form-control dpd2" name="ToDate" id="ToDate" runat="server" placeholder="To Date" />
-                                              <%--    <span class="input-group-addon">
+                                                <%--    <span class="input-group-addon">
                                                         <i class="fa fa-calendar"></i>
                                                     </span>--%>
                                             </div>
@@ -63,6 +63,13 @@
                             </div>
                         </div>
                         <div class="page-container-section">
+
+                            <div class="btn-group pull-right">
+                                  <a href="javascript:;" class="btn btn-success easyui-linkbutton tab-menu-item" data-url="Statistic.aspx" data-title="Statistics">
+                                    <i class="fa fa-bar-chart-o"></i> <span>Statistics</span>
+                                   </a>
+                            </div>
+
                             <!--mini statistics start-->
                             <div id="sveimList" runat="server">
                                 <div class="row">

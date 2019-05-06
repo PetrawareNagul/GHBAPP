@@ -21,10 +21,13 @@
 </head>
 <body class="login-body">
     <div class="container">
+
+
         <form id="loginForm" runat="server" class="form-signin">
             <h2 class="form-signin-heading">
                 <img class="img-responsive" src="Content/images/ghb_logo.png" style="height: 100px;" />
             </h2>
+
             <div class="login-wrap">
                 <div class="user-login-info">
                     <asp:TextBox ID="txtUsername" runat="server" CssClass="form-control" placeholder="Username" autofocus></asp:TextBox>
@@ -38,6 +41,12 @@
                     </span>
                 </label>
                 <asp:Button ID="btnLogin" runat="server" CssClass="btn btn-lg btn-login btn-block" Text="Sign in" OnClick="btnLogin_Click" />
+
+
+                <div id="divMessage" runat="server">
+                </div>
+                   
+
 
                 <%--<div class="registration">
                     Don't have an account yet?

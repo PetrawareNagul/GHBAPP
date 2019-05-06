@@ -16,27 +16,58 @@
                         <div class="page-common-section">
                             <div class="row">
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <div class="col-md-6">
-                                            <asp:DropDownList ID="DepartmentId" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <asp:DropDownList ID="DocType" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
-                                        </div>
-                                    </div>
+
+                                <div class="col-md-3">
+                                    <asp:DropDownList ID="DepartmentId" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
+                                    <asp:DropDownList ID="DocType" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" id="Search" name="Search" runat="server" class="form-control" placeholder="Search here" />
+                                    <input type="hidden" id="IsNewSearch" name="IsNewSearch" value="0" runat="server" clientidmode="static" />
+                                    <input type="hidden" id="IsClear" name="IsClear" value="0" runat="server" clientidmode="static" />
+                                </div>
+                                <%--           <div class="col-md-9">
                                     <div class="search-section">
-                                        <button type="button" id="btnSearch" class="button-common-label action-button" data-action="Search"><i class="fa fa-search"></i></button>
-                                        <input type="text" id="Search" name="Search" runat="server" class="form-control" placeholder="Search here" />
-                                        <input type="hidden" id="IsNewSearch" name="IsNewSearch" value="0" runat="server" clientidmode="static" />
+                                        <div class="search-features">
+                                         
+
+                                        </div>
+                                    </div>
+                                </div>--%>
+                                <div class="col-md-1">
+                                    <button type="button" id="btnSearch" class="action-button" data-action="Search"><i class="fa fa-search"></i></button>
+                                    <button type="button" id="btnRefresh" class="action-button" data-action="Refresh"><i class="fa fa-refresh"></i></button>
+                                </div>
+
+
+                                <%--     <div class="col-md-1">
+                                    </div>
+                                <div class="col-md-9">
+                                    <div class="search-section">
+                                        <div class="search-features">
+                                            <asp:DropDownList ID="DepartmentId" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
+                                            <asp:DropDownList ID="DocType" runat="server" class="form-control" ClientIDMode="Static"></asp:DropDownList>
+                                            <input type="text" id="Search" name="Search" runat="server" class="form-control" placeholder="Search here" />
+                                            <input type="hidden" id="IsNewSearch" name="IsNewSearch" value="0" runat="server" clientidmode="static" />
+                                            <input type="hidden" id="IsClear" name="IsClear" value="0" runat="server" clientidmode="static" />
+
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="col-md-2">
+                                    <button type="button" id="btnSearch" class="action-button" data-action="Search"><i class="fa fa-search"></i></button>
+                                    <button type="button" id="btnRefresh" class="action-button" data-action="Refresh"><i class="fa fa-refresh"></i></button>
+                                </div>--%>
+
+
+
                                 <div class="col-md-6">
                                     <div class="row">
                                         <div class="col-md-12">
                                             <small><strong>Note:</strong> <span>You can search here with AA Number, Account Number, Project Code, Welfare Code</span></small>
+
                                         </div>
                                     </div>
                                 </div>
@@ -50,25 +81,30 @@
 
                                     <div id="divError" runat="server" class="alert alert-block alert-danger fade in"></div>
 
+                                    <div id="divDownload" runat="server" class="btn-group pull-right">
+                                        <button id="btnDownload" type="button" class="btn btn-success"><i class="fa fa-download"></i>Download</button>
+                                    </div>
 
                                     <table class="display responsive nowrap table table-bordered dataTable langDirList" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
-                                                <th></th>
+                                                <th>S.No</th>
                                                 <th>Branch</th>
                                                 <th>Department</th>
                                                 <th>Batch No</th>
                                                 <th>Code No</th>
                                                 <th>PDF</th>
-                                                <th>Stage</th>
-                                                <th>Remarks</th>
+                                                <th>M-File Status</th>
                                                 <th>Updated Date</th>
+                                                <th>View</th>
                                             </tr>
                                         </thead>
                                         <tbody id="setsTbody" runat="server">
                                         </tbody>
                                     </table>
+
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -102,7 +138,7 @@
                     dataType: "json",
                     success: function (data) {
                         $('#DocType').html('');
-
+                        $('#DocType').append('<option value="0">Doc Type</option>');
                         $.each(data.d, function (index, value) {
                             $('#DocType').append('<option value="' + value.DocType + '">' + value.DocType + '</option>');
                         });
@@ -126,6 +162,18 @@
                     });
                 }, 'html');
             });
+
+            $('#btnRefresh').click(function () {
+                alert('Hi');
+                //IsClear
+            });
+
+
+            $('#btnDownload').click(function () {
+                var url = '/GetExcel.aspx?DepartmentId=' + $('#DepartmentId').val() + '&DocType=' + $('#DocType').val() + '&Search=' + $('#Search').val();
+                window.open(url, '_blank');
+            });
+
 
         });
 

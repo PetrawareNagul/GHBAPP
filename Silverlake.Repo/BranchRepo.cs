@@ -371,5 +371,32 @@ namespace Silverlake.Repo
             totalResultsCount = GetCount();
             return objs;
         }
+
+        public List<Branch> GetUtilizedBranches()
+        {
+            List<Branch> list = new List<Branch>();
+            try
+            {
+                string query = "select branch_id,code from batches a inner join branches b on a.branch_id = b.ID where a.status=1 "+
+                               " group by branch_id,code";
+                SqlCommand cmd = new SqlCommand(query, mySQLDBConnect.connection);
+                mySQLDBConnect.OpenConnection();
+                DataTable dt = new DataTable();
+                SqlDataAdapter dA = new SqlDataAdapter(cmd);
+                dA.Fill(dt); dA.Dispose();
+                list = (from x in dt.AsEnumerable()
+                        select new Branch
+                        {
+                            Id = x.Field<Int32>("branch_id"),
+                            Code = x.Field<String>("code")
+                        }).ToList();
+                mySQLDBConnect.CloseConnection();
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return list;
+        }
     }
 }

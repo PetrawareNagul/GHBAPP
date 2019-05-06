@@ -192,9 +192,9 @@
             
             <%--<script src="https://cdn.datatables.net/fixedcolumns/3.2.6/js/dataTables.fixedColumns.min.js"></script>--%>
             <script src="Content/js/iCheck/jquery.icheck.js"></script>
-            <script class="include" type="text/javascript" src="http://bucketadmin.themebucket.net/js/jquery.dcjqaccordion.2.7.js"></script>
-            <script src="http://bucketadmin.themebucket.net/js/chart-js/Chart.js"></script>
-
+            <%--<script class="include" type="text/javascript" src="http://bucketadmin.themebucket.net/js/jquery.dcjqaccordion.2.7.js"></script>--%>
+            <%--<script src="http://bucketadmin.themebucket.net/js/chart-js/Chart.js"></script>--%>
+            <script src="Content/js/chart-js/Chart.js"></script>
             <section id="main-content">
                 <div id="snackbar">Some text some message..</div>
                 <header class="header clearfix">

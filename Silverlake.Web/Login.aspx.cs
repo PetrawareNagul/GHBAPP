@@ -37,7 +37,8 @@ namespace Silverlake.Web
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            if (txtUsername.Text != "" && txtPassword.Text != "")
+            divMessage.Visible = false;
+            if (!string.IsNullOrEmpty(txtUsername.Text) && !string.IsNullOrEmpty(txtPassword.Text))
             {
                 string username = txtUsername.Text;
                 string password = txtPassword.Text;
@@ -70,6 +71,20 @@ namespace Silverlake.Web
                         Response.Redirect("Default.aspx");
                     }
                 }
+                else
+                {
+                    divMessage.Visible = true;
+                    divMessage.InnerHtml = @"<div class='alert alert-block alert-danger fade in'><button data-dismiss='alert' class='close close-sm' type='button'>
+                          < i class='fa fa-times'></i></button>
+                    <strong>Oh snap!</strong> invalid username or password.</div>";
+                }
+            }
+            else
+            {
+                divMessage.Visible = true;
+                divMessage.InnerHtml = @"<div class='alert alert-block alert-danger fade in'><button data-dismiss='alert' class='close close-sm' type='button'>
+                        <i class='fa fa-times'></i></button>
+                    <strong>Oh snap!</strong> Enter Username and Password.</div>";
             }
         }
 

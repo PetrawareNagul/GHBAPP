@@ -27,6 +27,7 @@ namespace Silverlake.Utility.Helper
         public int PageCount { get; set; }
         public int IsReleased { get; set; }
         public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
     }
 
 

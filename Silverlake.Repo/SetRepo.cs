@@ -520,7 +520,7 @@ namespace Silverlake.Repo
             List<DocTypeSetModel> objs = new List<DocTypeSetModel>();
             try
             {
-                string query = " select b.batch_id,c.set_id,a.branch_id,a.department_id,a.batch_no,a.batch_user,c.doc_type,b.aa_no,b.account_no,c.page_count,b.is_released,b.created_date from batches a inner join sets b on a.ID=b.batch_id " +
+                string query = " select b.batch_id,c.set_id,a.branch_id,a.department_id,a.batch_no,a.batch_user,c.doc_type,b.aa_no,b.account_no,c.page_count,b.is_released,b.created_date,b.updated_date from batches a inner join sets b on a.ID=b.batch_id " +
                                " inner join set_documents c on b.ID = c.set_id " +
                                " where a.status = 1";
                 if (department_id != 0)
@@ -529,8 +529,8 @@ namespace Silverlake.Repo
                     query += " and c.doc_type='" + doc_type + "'";
                 if (!string.IsNullOrEmpty(aano))
                     query += " and (aa_no like '%" + aano + "%' or account_no like '%" + aano + "%')";
-                query += " group by batch_id,set_id,branch_id,department_id,batch_no,batch_user,doc_type,aa_no,account_no,page_count,is_released,b.created_date ";
-                query += " order by created_date desc ";
+                query += " group by batch_id,set_id,branch_id,department_id,batch_no,batch_user,doc_type,aa_no,account_no,page_count,is_released,b.created_date,b.updated_date ";
+                query += " order by updated_date desc ";
                 if (take != 0)
                     query += " OFFSET " + skip + " ROWS FETCH NEXT " + take + " ROWS ONLY";
 

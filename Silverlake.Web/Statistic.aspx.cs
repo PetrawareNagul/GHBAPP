@@ -17,57 +17,114 @@ namespace Silverlake.Web
     public partial class Statistic : System.Web.UI.Page
     {
         private static readonly Lazy<IBatchService> lazyBatchServiceObj = new Lazy<IBatchService>(() => new BatchService());
-
         public static IBatchService IBatchService { get { return lazyBatchServiceObj.Value; } }
-        private static readonly Lazy<IDepartmentService> lazyDepartmentServiceObj = new Lazy<IDepartmentService>(() => new DepartmentService());
 
+        private static readonly Lazy<IBranchService> lazyBranchServiceObj = new Lazy<IBranchService>(() => new BranchService());
+        public static IBranchService IBranchService { get { return lazyBranchServiceObj.Value; } }
+
+        private static readonly Lazy<IDepartmentService> lazyDepartmentServiceObj = new Lazy<IDepartmentService>(() => new DepartmentService());
         public static IDepartmentService IDepartmentService { get { return lazyDepartmentServiceObj.Value; } }
 
+
         public string totalApplication = "";
+        public string path = ConfigurationManager.AppSettings["SANDrive"].ToString();
+
+        public string barChatQuery = string.Empty;
+        public string pieChatQuery = string.Empty;
+        public string totalDepartmentsQuery = string.Empty;
+
+        public string startDate = ""; public string endDate = "";
+
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(Request.QueryString["FromDate"]))
+                FromDate.Value = startDate = Request.QueryString["FromDate"];
 
+            if (!string.IsNullOrEmpty(Request.QueryString["ToDate"]))
+                ToDate.Value = endDate = Request.QueryString["ToDate"];
 
-            DirectoryInfo DirInfo = new DirectoryInfo(@"D:\");
-            //var files = DirInfo.GetFiles("*",SearchOption.AllDirectories).Where(a => a.LastAccessTime < DateTime.Now.AddDays(-20) && a.LastAccessTime > DateTime.Now).Sum(a =>a.Length);
-            //long totalSize = DirInfo.EnumerateFiles("*.*",SearchOption.AllDirectories).Where(a =>a.LastWriteTime >= DateTime.Now.AddDays(-40) && a.LastWriteTime <= DateTime.Now).Sum(file => file.Length);
-            double filesSize = GetFiles(@"D:\", "*.*");
+            divResult.InnerHtml = "";
+            divResult.Visible = false;
 
-            var data = DirInfo.GetFiles("*").ToList();
+            var branches = IBranchService.GetUtilizedBranches();
+            BranchId.DataSource = branches;
+            BranchId.DataTextField = "Code";
+            BranchId.DataValueField = "Id";
+            BranchId.DataBind();
+            BranchId.Items.Insert(0, new ListItem() { Text = "All", Value = "0" });
+            if (!string.IsNullOrEmpty(Request.QueryString["BranchId"]))
+                BranchId.SelectedValue = Request.QueryString["BranchId"];
 
-
-            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
-            double len = filesSize;
-            int order = 0;
-            while (len >= 1024 && order < sizes.Length - 1)
+            if (!string.IsNullOrEmpty(Request.QueryString["IsClear"]) && Request.QueryString["IsClear"] == "1")
             {
-                order++;
-                len = len / 1024;
+                FromDate.Value = ToDate.Value = startDate = endDate = string.Empty;
+                BranchId.SelectedValue = "0";
             }
+            if (datechecking())
+            {
+                Querys();
+                List<StatisticModel> last5DaysCount = IBatchService.GetDaysCountbyDepartment(barChatQuery, 0, 0, true);
 
-            // Adjust the format string to your preferences. For example "{0:0.#}{1}" would
-            // show a single decimal place, and no space.
-            string result = String.Format("{0:0.##} {1}", len, sizes[order]);
+                if (last5DaysCount.Count == 0)
+                {
+                    divResult.InnerHtml = @"<div class='alert alert-block alert-danger fade in'><button data-dismiss='alert' class='close close-sm' type='button'>
+                                                <i class='fa fa-times'></i>
+                                                </button>
+                                                <strong>Oh snap!</strong> No records found for the search criteria entered.</div>";
+                    divResult.Visible = true;
+                }
+                else
+                    dataBind(last5DaysCount);
+
+            }
+        }
 
 
-            string path = ConfigurationManager.AppSettings["MimzyCaptureOuputFiles"].ToString();
+        public bool datechecking()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
+                {
+                    DateTime dt1 = Convert.ToDateTime(startDate);
+                    DateTime dt2 = Convert.ToDateTime(endDate);
+                    if (dt1 > dt2)
+                    {
+
+                        divResult.InnerHtml = @"<div class='alert alert-block alert-danger fade in'><button data-dismiss='alert' class='close close-sm' type='button'>
+                                                <i class='fa fa-times'></i>
+                                                </button>
+                                                <strong>Oh snap!</strong> From date should be less than to date.</div>";
+                        divResult.Visible = true;
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            return true;
+        }
+
+        public void dataBind(List<StatisticModel> last5DaysCount)
+        {
             DriveInfo dDrive = new DriveInfo(path);
             if (dDrive.IsReady)
             {
+                if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
+                {
+                    double totalfilesSize = GetFilesSize(path, "*.*", startDate, endDate);
+                    double freeSpace = (totalfilesSize / 1024 / 1024 / 1024);
+                    if (freeSpace != 0 && freeSpace < 1)
+                        freeSpace = 1;
+                    lblfreeSpace.Value = freeSpace.ToString();
+                }
+                else
+                    lblfreeSpace.Value = ((dDrive.TotalSize / 1024 / 1024 / 1024) - (dDrive.TotalFreeSpace / 1024 / 1024 / 1024)).ToString();
+
                 lbltotalSize1.Text = (dDrive.TotalSize / 1024 / 1024 / 1024).ToString();
-                lblfreeSpace.Value = ((dDrive.TotalSize / 1024 / 1024 / 1024) - (dDrive.TotalFreeSpace / 1024 / 1024 / 1024)).ToString();
             }
-
-
-            // last 5 days data for bar chat
-            string qurey = " SELECT CAST(created_date AS DATE) AS CreatedOn,department_id, COUNT(department_id) as count,sum(batch_count) as SetCount " +
-                           " FROM batches where status = 1 and stage_id = 6 and CAST(created_date AS DATE) between " +
-                           " (select top 1 * from(select top 5 CAST(created_date AS DATE) as chartDate from batches where status = 1 and stage_id = 6 group by CAST(created_date AS DATE) order by 1 desc) as tab order by 1) and " +
-                           " (select top 1 * from(select top 5 CAST(created_date AS DATE) as chartDate from batches where status = 1 and stage_id = 6 group by CAST(created_date AS DATE) order by 1 desc) as tab order by 1 desc) " +
-                           " GROUP BY CAST(created_date AS DATE),department_id order by 1 ";
-
-            List<StatisticModel> last5DaysCount = IBatchService.GetDaysCountbyDepartment(qurey, 0, 0, true);
-
 
             StringBuilder DepartmentHtml = new StringBuilder();
             // Department binding
@@ -112,8 +169,6 @@ namespace Silverlake.Web
 
                 lblDays.Value = date;
 
-
-
                 //Today scan chat
                 var todaysDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.Today.Day);
                 todayHtml.Append("<table id=tbltoDays>");
@@ -122,23 +177,26 @@ namespace Silverlake.Web
                 foreach (int depid in objs.Select(a => a.Id).Distinct().ToList())
                 {
                     todayHtml.Append("<tr class='departmentcolor'><td><label id='departmentcolor'> " + GetColor(depid) + @"</label> </td>");
-                    string depCount = string.Empty;
-                    if (last5DaysCount.Count(a => a.CreatedOn == todaysDate && a.DepartmentId == depid) != 0)
-                    {
-                        depCount = last5DaysCount.FirstOrDefault(a => a.CreatedOn == todaysDate && a.DepartmentId == depid).SetCount.ToString();
-                        if (!string.IsNullOrEmpty(todaySetCount))
-                            todaySetCount += "," + depCount;
-                        else
-                            todaySetCount = depCount;
-                        if (!string.IsNullOrEmpty(todayColor))
-                            todayColor += "," + GetColor(depid);
-                        else
-                            todayColor = GetColor(depid);
-                    }
+                    string depCount = "0";
+                    if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
+                        depCount = last5DaysCount.Where(a => a.DepartmentId == depid).Sum(a => a.SetCount).ToString();
                     else
-                        depCount = "0";
-                    todayHtml.Append("<td><label id='lbldepartmentsetcount'>" + depCount + @"</label>  </td></tr>");
+                    {
+                        if (last5DaysCount.Count(a => a.CreatedOn == todaysDate && a.DepartmentId == depid) != 0)
+                            depCount = last5DaysCount.FirstOrDefault(a => a.CreatedOn == todaysDate && a.DepartmentId == depid).SetCount.ToString();
+                    }
 
+                    if (!string.IsNullOrEmpty(todaySetCount))
+                        todaySetCount += "," + depCount;
+                    else
+                        todaySetCount = depCount;
+
+                    if (!string.IsNullOrEmpty(todayColor))
+                        todayColor += "," + GetColor(depid);
+                    else
+                        todayColor = GetColor(depid);
+
+                    todayHtml.Append("<td><label id='lbldepartmentsetcount'>" + depCount + @"</label>  </td></tr>");
                 }
                 todayHtml.Append("</table>");
                 divDayCount.InnerHtml = todayHtml.ToString();
@@ -175,18 +233,12 @@ namespace Silverlake.Web
             // end
 
             // last month for pie chat
-            string monthQurey = "SELECT department_id, COUNT(department_id) as count,sum(batch_count) as SetCount,code as DepartmentCode  FROM batches a inner join departments b on a.department_id=b.ID  " +
-                                " where a.status = 1 and stage_id = 6 and " +
-                                " DATEPART(m, a.created_date) = DATEPART(m, DATEADD(m, -1, getdate()))  AND " +
-                                " DATEPART(yyyy, a.created_date) = DATEPART(yyyy, DATEADD(m, -1, getdate())) " +
-                                " GROUP BY department_id,code order by 1";
-
             string monthColors = "";
-            List<StatisticModel> monthCount = IBatchService.GetTotalCountbyDepartment(monthQurey, 0, 0, true);
+            List<StatisticModel> monthCount = IBatchService.GetTotalCountbyDepartment(pieChatQuery, 0, 0, true);
             if (monthCount != null && monthCount.Count != 0)
             {
                 StringBuilder filter = new StringBuilder();
-                filter.AppendLine("<table style='position: absolute; top: 5px; right: 5px; font - size:smaller; color:#545454'>");
+                filter.AppendLine("<table style='position: absolute; margin-top: 5px; right: 20px; font - size:smaller; color:#545454'>");
                 filter.AppendLine("<tbody>");
                 foreach (StatisticModel statistic in monthCount.OrderBy(a => a.DepartmentId).ToList())
                 {
@@ -208,16 +260,12 @@ namespace Silverlake.Web
             //end
 
             // Total data for pie chat
-            string totalQurey = "SELECT department_id, COUNT(department_id) as count,sum(batch_count) as SetCount,b.code as DepartmentCode FROM  " +
-                                " batches a inner join departments b on a.department_id = b.ID  where a.status =1 and stage_id =" + (int)BatchesStages.Document + "" +
-                                " GROUP BY department_id,code order by 1";
-
             string totalColors = "";
-            List<StatisticModel> totalStagesCount = IBatchService.GetTotalCountbyDepartment(totalQurey, 0, 0, true);
+            List<StatisticModel> totalStagesCount = IBatchService.GetTotalCountbyDepartment(totalDepartmentsQuery, 0, 0, true);
             if (totalStagesCount != null && totalStagesCount.Count != 0)
             {
                 StringBuilder filter = new StringBuilder();
-                filter.AppendLine("<table style='position: absolute; top: 5px; right: 5px; font - size:smaller; color:#545454'>");
+                filter.AppendLine("<table style='position: absolute; margin-top: 5px; right: 20px; font - size:smaller; color:#545454'>");
                 filter.AppendLine("<tbody>");
                 foreach (StatisticModel statistic in totalStagesCount.OrderBy(a => a.DepartmentId).ToList())
                 {
@@ -237,6 +285,16 @@ namespace Silverlake.Web
             lblTotalApplication.Value = totalApplication = totalStagesCount.Sum(a => a.SetCount).ToString();
             lblTotal.Value = string.Join(",", totalStagesCount.Select(x => x.SetCount).ToArray());
             lblTotalColors.Value = totalColors;
+            if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
+            {
+                divResult.InnerHtml = @"<div class='alert alert-success fade in'>
+                           <button data-dismiss='alert' class='close close-sm' type='button'>
+                           <i class='fa fa-times'></i></button>
+                           <strong>Done!</strong> Found the statistics between " + startDate + " - " + endDate + @"
+                           </div>";
+                divResult.Visible = true;
+                BindHeaders();
+            }
             // end
         }
 
@@ -246,28 +304,28 @@ namespace Silverlake.Web
             switch (departmentId)
             {
                 case 1:
-                    color = "E1EB5A";
+                    color = "003f5c";
                     break;
                 case 2:
-                    color = "EB6D5A";
+                    color = "2f4b7c";
                     break;
                 case 3:
-                    color = "9DEB5A";
+                    color = "665191";
                     break;
                 case 4:
-                    color = "98F5D3";
+                    color = "a05195";
                     break;
                 case 5:
-                    color = "A786F2";
+                    color = "d45087";
                     break;
                 case 6:
-                    color = "95A5A6";
+                    color = "f95d6a";
                     break;
                 case 7:
-                    color = "E75EC0";
+                    color = "ff7c43";
                     break;
                 case 8:
-                    color = "5D6D7E";
+                    color = "ffa600";
                     break;
                 case 9:
                     color = "229954";
@@ -294,7 +352,7 @@ namespace Silverlake.Web
                     next = Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories).Where(d => !d.StartsWith("D:\\System Volume Information")).ToArray();
                     totalSize += Directory.GetFiles(path, searchPattern).Sum(a => a.Length);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                 }
                 if (next != null && next.Length != 0)
@@ -309,8 +367,8 @@ namespace Silverlake.Web
                         if (fi.LastWriteTime <= dt1)
                             status = true;
 
-                        if(fi.LastWriteTime >= dt2 && fi.LastWriteTime <= dt1)
-                        totalSize +=  fi.Length;
+                        if (fi.LastWriteTime >= dt2 && fi.LastWriteTime <= dt1)
+                            totalSize += fi.Length;
                     }
                     return totalSize;
                 }
@@ -328,8 +386,113 @@ namespace Silverlake.Web
                     return totalSize;
                 }
                 catch { }
+
+                //string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+                //double len = filesSize;
+                //int order = 0;
+                //while (len >= 1024 && order < sizes.Length - 1)
+                //{
+                //    order++;
+                //    len = len / 1024;
+                //}
+
+                //// Adjust the format string to your preferences. For example "{0:0.#}{1}" would
+                //// show a single decimal place, and no space.
+                //string result = String.Format("{0:0.##} {1}", len, sizes[order]);
             }
             return totalSize;
+        }
+
+
+        public double GetFilesSize(string root, string searchPattern, string startDate, string endDate)
+        {
+            try
+            {
+                DateTime dt1 = Convert.ToDateTime(startDate);
+                DateTime dt2 = Convert.ToDateTime(endDate);
+                double totalSize = 0;
+                if (!string.IsNullOrEmpty(root))
+                {
+                    try
+                    {
+                        foreach (var subdir in Directory.GetDirectories(path))
+                        {
+                            DirectoryInfo info = new DirectoryInfo(subdir);
+                            totalSize += info.EnumerateFiles(searchPattern, SearchOption.AllDirectories).Where(a => a.LastWriteTime >= dt1 && a.LastWriteTime <= dt2).Sum(a => a.Length);
+                        }
+                        return totalSize;
+                    }
+                    catch { }
+                }
+                return totalSize;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public void BindHeaders()
+        {
+            lblSANDrive.InnerText = "SAN DRIVE MEMORY";
+            lblScan.InnerText = "SCAN";
+            lblTransfer.InnerText ="TRANSFER";
+            lblTotalApp.InnerText = "APPLICATIONS";
+            lblMonthApp.InnerText = "Application Chart";
+        }
+
+
+        public void Querys()
+        {
+            if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
+            {
+                barChatQuery = " SELECT CAST(created_date AS DATE) AS CreatedOn,department_id, COUNT(department_id) as count,sum(batch_count) as SetCount " +
+                                 " FROM batches where status = 1 and stage_id =" + (int)BatchesStages.Document + " and CAST(created_date AS DATE) between " +
+                                 " '" + startDate + @"' and '" + endDate + @"' ";
+                if (!string.IsNullOrEmpty(BranchId.SelectedItem.Value) && BranchId.SelectedItem.Value != "0")
+                    barChatQuery += " and branch_id=" + BranchId.SelectedItem.Value;
+                barChatQuery += " GROUP BY CAST(created_date AS DATE),department_id order by 1";
+
+                pieChatQuery = "SELECT department_id, COUNT(department_id) as count,sum(batch_count) as SetCount,code as DepartmentCode  FROM batches a inner join departments b on a.department_id=b.ID  " +
+                         "  where a.status = 1 and stage_id =" + (int)BatchesStages.Document + " and a.updated_date between'" + startDate + @"'  AND '" + endDate + @"' ";
+                if (!string.IsNullOrEmpty(BranchId.SelectedItem.Value) && BranchId.SelectedItem.Value != "0")
+                    pieChatQuery += " and a.branch_id=" + BranchId.SelectedItem.Value;
+                pieChatQuery += "  GROUP BY department_id,code order by 1";
+
+                //totalDepartmentsQuery = "SELECT department_id, COUNT(department_id) as count,sum(batch_count) as SetCount,b.code as DepartmentCode FROM " +
+                //        "  batches a inner join departments b on a.department_id = b.ID  where a.status = 1 and stage_id =" + (int)BatchesStages.Document + "" +
+                //        "  and a.updated_date between '" + startDate + @"' and '" + endDate + @"' ";
+                //if (!string.IsNullOrEmpty(BranchId.SelectedItem.Value) && BranchId.SelectedItem.Value != "0")
+                //    totalDepartmentsQuery += " and a.branch_id=" + BranchId.SelectedItem.Value;
+                //totalDepartmentsQuery += "  GROUP BY department_id,code order by 1";
+            }
+            else
+            {
+                // last 5 days data for bar chat
+                barChatQuery = " SELECT CAST(created_date AS DATE) AS CreatedOn,department_id, COUNT(department_id) as count,sum(batch_count) as SetCount " +
+                               " FROM batches where status = 1 and stage_id =" + (int)BatchesStages.Document + " and CAST(created_date AS DATE) between " +
+                               " (select top 1 * from(select top 5 CAST(created_date AS DATE) as chartDate from batches where status = 1 and stage_id = " + (int)BatchesStages.Document + " group by CAST(created_date AS DATE) order by 1 desc) as tab order by 1) and " +
+                               " (select top 1 * from(select top 5 CAST(created_date AS DATE) as chartDate from batches where status = 1 and stage_id = " + (int)BatchesStages.Document + " group by CAST(created_date AS DATE) order by 1 desc) as tab order by 1 desc) ";
+                if (!string.IsNullOrEmpty(BranchId.SelectedItem.Value) && BranchId.SelectedItem.Value != "0")
+                    barChatQuery += " and branch_id=" + BranchId.SelectedItem.Value;
+                barChatQuery += " GROUP BY CAST(created_date AS DATE),department_id order by 1 ";
+
+                // last month for pie chat
+                pieChatQuery = "SELECT department_id, COUNT(department_id) as count,sum(batch_count) as SetCount,code as DepartmentCode  FROM batches a inner join departments b on a.department_id=b.ID  " +
+                            " where a.status = 1 and stage_id = " + (int)BatchesStages.Document + " and " +
+                            " DATEPART(m, a.created_date) = DATEPART(m, DATEADD(m, -1, getdate()))  AND " +
+                            " DATEPART(yyyy, a.created_date) = DATEPART(yyyy, DATEADD(m, -1, getdate())) ";
+                if (!string.IsNullOrEmpty(BranchId.SelectedItem.Value) && BranchId.SelectedItem.Value != "0")
+                    pieChatQuery += " and a.branch_id=" + BranchId.SelectedItem.Value;
+                pieChatQuery += " GROUP BY department_id,code order by 1";
+
+            }
+            // All departments counts
+            totalDepartmentsQuery = "SELECT department_id, COUNT(department_id) as count,sum(batch_count) as SetCount,b.code as DepartmentCode FROM  " +
+             " batches a inner join departments b on a.department_id = b.ID  where a.status =1 and stage_id =" + (int)BatchesStages.Document + "";
+            if (!string.IsNullOrEmpty(BranchId.SelectedItem.Value) && BranchId.SelectedItem.Value != "0")
+                totalDepartmentsQuery += " and a.branch_id=" + BranchId.SelectedItem.Value;
+            totalDepartmentsQuery += " GROUP BY department_id,code order by 1";
         }
     }
 }

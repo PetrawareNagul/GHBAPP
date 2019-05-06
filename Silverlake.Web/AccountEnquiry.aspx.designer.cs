@@ -58,6 +58,15 @@ namespace Silverlake.Web {
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden IsNewSearch;
         
         /// <summary>
+        /// IsClear control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden IsClear;
+        
+        /// <summary>
         /// divResult control.
         /// </summary>
         /// <remarks>
@@ -74,6 +83,15 @@ namespace Silverlake.Web {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divError;
+        
+        /// <summary>
+        /// divDownload control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divDownload;
         
         /// <summary>
         /// setsTbody control.

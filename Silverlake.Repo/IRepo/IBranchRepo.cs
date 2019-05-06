@@ -10,5 +10,6 @@ namespace Silverlake.Repo.IRepo
 {
     public interface IBranchRepo : IDefaultInterface<Branch>
     {
+        List<Branch> GetUtilizedBranches();
     }
 }

@@ -229,5 +229,10 @@ namespace Silverlake.Service
             }
             return result;
         }
+
+        public List<Branch> GetUtilizedBranches()
+        {
+            return IBranchRepo.GetUtilizedBranches();
+        }
     }
 }

@@ -360,7 +360,15 @@
 
             if (action == 'Search') {
                 $('#' + formID + ' #IsNewSearch').val('1');
+                $('#' + formID + ' #IsClear').val('1');
                 setTimeout(loadContent, 100);
+            }
+            if (action == 'Refresh') {
+                $('#' + formID + ' #IsClear').val('1');
+                //setTimeout(loadContent, 100);
+            } else {
+                $('#' + formID + ' #IsClear').val('0');
+                //setTimeout(loadContent, 100);
             }
 
             if (action == 'View') {

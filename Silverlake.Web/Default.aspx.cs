@@ -46,11 +46,6 @@ namespace Silverlake.Web
                                                     <span>Dashboard</span>
                                                 </a>
                                             </li>
-                                            <li>
-                                                <a href='javascript:;' class='easyui-linkbutton tab-menu-item' data-url='Statistic.aspx' data-title='Statistics'>
-                                                    <span>Statistics</span>
-                                                </a>
-                                            </li>
                                             <li class='sub-menu'>
                                                 <a href='javascript:;'>
                                                     <span>Monitoring/Reporting</span>
