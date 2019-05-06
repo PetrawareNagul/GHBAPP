@@ -408,7 +408,6 @@ namespace Silverlake.Web
         {
             try
             {
-                // test
                 DateTime dt1 = Convert.ToDateTime(startDate);
                 DateTime dt2 = Convert.ToDateTime(endDate);
                 double totalSize = 0;
